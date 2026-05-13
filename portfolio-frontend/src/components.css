@@ -1,0 +1,243 @@
+/* ============================================================
+   Portfolio App - Component Styles
+   ============================================================ */
+
+/* ── Dashboard ───────────────────────────────────────────── */
+
+.summary-card { text-align: center; }
+.summary-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 8px 0;
+  letter-spacing: -0.02em;
+}
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.market-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.market-item {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 8px;
+}
+
+.market-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.market-price {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.market-change {
+  font-size: 10px;
+  margin-top: 3px;
+}
+
+/* Pie Chart legend */
+.pie-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+}
+
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legend-name {
+  flex: 1;
+  color: var(--text-secondary);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.legend-pct {
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Tab Toggle */
+.tab-toggle {
+  display: flex;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.tab-btn {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background: var(--accent-cyan);
+  color: #0a0e1a;
+  font-weight: 600;
+}
+
+/* Rates */
+.rates-list { display: flex; flex-direction: column; gap: 10px; }
+.rate-row { display: flex; justify-content: space-between; align-items: center; }
+.rate-label { font-size: 13px; color: var(--text-secondary); }
+.rate-value { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+
+/* Movers */
+.mover-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(30,45,69,0.4);
+}
+.mover-ticker { font-size: 12px; font-weight: 600; }
+.mover-pct { font-size: 12px; }
+
+/* ── Portfolio ───────────────────────────────────────────── */
+
+.expanded-row td { background: var(--bg-secondary) !important; }
+
+.holding-detail {
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.detail-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.detail-value {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ── Watchlist ───────────────────────────────────────────── */
+
+.watchlist-item {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  gap: 8px;
+}
+
+.watchlist-item:hover, .watchlist-item.selected {
+  border-color: var(--accent-cyan);
+  background: var(--bg-card-hover);
+}
+
+.wl-left { flex: 1; }
+.wl-ticker { font-size: 14px; font-weight: 600; }
+.wl-name { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.wl-right { text-align: right; }
+.wl-price { font-size: 14px; font-weight: 600; }
+.wl-change { font-size: 11px; margin-top: 2px; }
+
+.wl-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+.wl-remove:hover { color: var(--accent-red); }
+
+/* Chip buttons (period/interval selectors) */
+.chip-btn {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid var(--border-light);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.chip-btn.active {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: white;
+}
+.chip-btn:hover:not(.active) {
+  border-color: var(--text-muted);
+  color: var(--text-secondary);
+}
+
+/* ── Misc ────────────────────────────────────────────────── */
+
+.text-muted { color: var(--text-muted); }
+.ml-6 { margin-left: 6px; }
