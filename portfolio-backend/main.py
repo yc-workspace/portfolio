@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from typing import Optional
 import logging
 
-from routers import quotes, portfolio, watchlist, settings, futures
+from routers import quotes, portfolio, watchlist, settings, futures, debug
 from database import init_db
 from services.shioaji_service import ShioajiService
 
@@ -53,6 +53,7 @@ app.include_router(portfolio.router, prefix="/api/portfolio", tags=["portfolio"]
 app.include_router(watchlist.router, prefix="/api/watchlist", tags=["watchlist"])
 app.include_router(settings.router, prefix="/api/settings", tags=["settings"])
 app.include_router(futures.router, prefix="/api/futures", tags=["futures"])
+app.include_router(debug.router, tags=["debug"])
 
 @app.get("/")
 async def root():
