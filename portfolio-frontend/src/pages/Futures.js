@@ -1,65 +1,64 @@
-// ============================================================
-// Futures.js - 期貨看板
-// ============================================================
-import React, { useState, useEffect, useCallback } from 'react';
-import { api } from '../api';
+import React, { useContext } from 'react';
+import { QuoteContext } from '../App';
 
-export function Futures() {
-  const [txf, setTxf] = useState(null);
-  const [intl, setIntl] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [lastUpdate, setLastUpdate] = useState(null);
+export default function Futures() {
+  const { marketData, fetching, lastFetchedAt, refresh } = useContext(QuoteContext);
 
-  const load = useCallback(async () => {
-    try {
-      const [txfData, intlData] = await Promise.all([
-        api.getTxfQuote(),
-        api.getInternationalFutures()
-      ]);
-      setTxf(txfData);
-      setIntl(intlData);
-      setLastUpdate(new Date());
-    } catch (e) {
-      console.error('Futures load error:', e);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // Extract TXF and TWII from shared market data
+  const txf  = marketData?.find(d => d.symbol === 'TXFR1');
+  const twii = marketData?.find(d => d.symbol === 'TWII');
 
-  useEffect(() => {
-    load();
-    const timer = setInterval(load, 5 * 60 * 1000);
-    return () => clearInterval(timer);
-  }, [load]);
+  const fmt = (n, d = 0) =>
+    n != null ? n.toLocaleString(undefined, { maximumFractionDigits: d }) : '—';
 
-  const fmt = (n, d = 2) => n != null ? n.toLocaleString(undefined, { maximumFractionDigits: d }) : '—';
-
-  const QuoteCard = ({ title, item, big = false }) => {
+  const QuoteCard = ({ item, big = false }) => {
     if (!item) return null;
-    const isUp = item.price_change_pct > 0;
-    const isDown = item.price_change_pct < 0;
-    const cls = isUp ? 'up' : isDown ? 'down' : 'flat';
+    const chg = item.price_change_pct;
+    const cls   = chg > 0 ? 'up' : chg < 0 ? 'down' : 'flat';
+    const arrow = chg > 0 ? '▲' : chg < 0 ? '▼' : '─';
     return (
-      <div className="card" style={{ marginBottom: 8 }}>
-        <div className="card-title">{title}</div>
-        {item.note && <div style={{ fontSize: 11, color: 'var(--accent-yellow)', marginBottom: 8 }}>⚠ {item.note}</div>}
+      <div className="card" style={{ marginBottom: 10 }}>
+        <div className="card-header">
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 13 }}>{item.label}</div>
+            {item.note && (
+              <div style={{ fontSize: 11, color: 'var(--accent-yellow)', marginTop: 3 }}>
+                ⚠ {item.note}
+              </div>
+            )}
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+            {item.source === 'shioaji' ? '永豐即時' : item.source || ''}
+          </div>
+        </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <div>
-            <div className={`num ${cls}`} style={{ fontSize: big ? 28 : 22, fontWeight: 700, lineHeight: 1 }}>
-              {fmt(item.price, item.price > 1000 ? 0 : 2)}
+            <div className={`num ${cls}`} style={{ fontSize: big ? 30 : 22, fontWeight: 700 }}>
+              {fmt(item.price)}
             </div>
-            <div className={`num ${cls}`} style={{ fontSize: 13, marginTop: 6 }}>
-              {isUp ? '▲' : isDown ? '▼' : '─'}{' '}
-              {item.price_change != null ? `${fmt(Math.abs(item.price_change), 0)}` : ''}
-              {item.price_change_pct != null ? ` (${Math.abs(item.price_change_pct).toFixed(2)}%)` : ''}
+            <div className={`num ${cls}`} style={{ fontSize: 13, marginTop: 4 }}>
+              {arrow} {item.price_change != null ? fmt(Math.abs(item.price_change)) : ''}
+              {chg != null ? ` (${Math.abs(chg).toFixed(2)}%)` : ''}
             </div>
           </div>
-          {item.volume != null && (
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>成交量</div>
-              <div className="num" style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{item.volume?.toLocaleString()}</div>
-            </div>
-          )}
+          <div style={{ textAlign: 'right' }}>
+            {item.high > 0 && (
+              <>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>高 / 低</div>
+                <div className="num" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                  {fmt(item.high)} / {fmt(item.low)}
+                </div>
+              </>
+            )}
+            {item.volume > 0 && (
+              <>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 4 }}>成交量</div>
+                <div className="num" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                  {item.volume?.toLocaleString()}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -72,24 +71,45 @@ export function Futures() {
           <div>
             <div className="page-title">期貨看板</div>
             <div className="page-subtitle">
-              {lastUpdate ? `更新 ${lastUpdate.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}` : '—'}
+              {lastFetchedAt
+                ? `更新 ${lastFetchedAt.toLocaleTimeString('zh-TW',
+                    { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`
+                : '—'}
             </div>
           </div>
-          <button className="btn btn-ghost" onClick={load} style={{ fontSize: 12 }}>↻ 刷新</button>
+          <button className="btn btn-ghost" style={{ fontSize: 12 }}
+                  onClick={refresh} disabled={fetching}>
+            {fetching ? '更新中…' : '↻ 刷新'}
+          </button>
         </div>
       </div>
 
-      {loading ? <div className="loading-spinner">載入期貨資料...</div> : (
+      {!marketData ? (
+        <div className="loading-spinner">載入期貨資料...</div>
+      ) : (
         <>
-          {txf && <QuoteCard title={`台指期 ${txf.contract || ''}`} item={txf} big />}
-          <div className="card-title" style={{ padding: '4px 24px', color: 'var(--text-muted)' }}>國際期貨</div>
-          {intl.map(item => (
-            <QuoteCard key={item.symbol} title={item.label} item={item} />
+          <div className="card-title" style={{ padding: '4px 24px 0', color: 'var(--text-muted)' }}>
+            台灣期貨
+          </div>
+          <QuoteCard item={txf}  big />
+          <QuoteCard item={twii} />
+
+          <div className="card-title" style={{ padding: '12px 24px 0', color: 'var(--text-muted)' }}>
+            國際指數（參考）
+          </div>
+          {['SPX', 'NDX', 'SOX'].map(sym => (
+            <QuoteCard key={sym} item={marketData.find(d => d.symbol === sym)} />
           ))}
+
+          <div style={{ margin: '12px 12px 0', padding: 12,
+                        background: 'var(--bg-card)', borderRadius: 8,
+                        border: '1px solid var(--border)', fontSize: 11,
+                        color: 'var(--text-muted)', lineHeight: 1.8 }}>
+            💡 台指期日盤 09:00–13:45 · 夜盤 15:00–05:00<br />
+            連線永豐API後可取得即時台指期報價
+          </div>
         </>
       )}
     </div>
   );
 }
-
-export default Futures;
